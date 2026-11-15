@@ -38,6 +38,10 @@ RSpec.describe DaVinciDTRTestKit::MockPayer::FullEHRV220QuestionnairePackageEndp
 
   before do
     allow_any_instance_of(DaVinciDTRTestKit::URLs).to receive(:suite_id).and_return(suite_id)
+    # Answer any {{fhirpath}} token in the template, so this spec does not depend on whether the
+    # fixture uses tokens.
+    stub_request(:post, %r{/fhirpath/evaluate})
+      .to_return(status: 200, body: [{ type: 'string', element: 'synthetic' }].to_json)
     DaVinciDTRTestKit::FixtureLoader.instance.instance_variable_set(:@cache, {})
   end
 
