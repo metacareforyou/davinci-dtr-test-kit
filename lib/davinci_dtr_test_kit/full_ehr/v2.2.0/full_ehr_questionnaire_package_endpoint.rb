@@ -2,6 +2,7 @@ require 'udap_security_test_kit'
 require_relative '../endpoints/mock_payer'
 require_relative '../../cross_suite/fhirpath_utils'
 require_relative '../../cross_suite/response_selection_utils'
+require_relative '../../cross_suite/v2.2.0/adaptive_service_url'
 require_relative '../fixture_loader'
 require_relative '../../tags'
 
@@ -11,6 +12,7 @@ module DaVinciDTRTestKit
       include MockPayer
       include DaVinciDTRTestKit::FhirpathUtils
       include DaVinciDTRTestKit::ResponseSelectionUtils
+      include DaVinciDTRTestKit::AdaptiveServiceUrl
 
       def test_run_identifier
         return request.params[:session_path] if request.params[:session_path].present?
@@ -101,11 +103,16 @@ module DaVinciDTRTestKit
           )
         )
         result.parameter.each { |param| strip_inferno_extensions(param) } if result.is_a?(FHIR::Parameters)
-        result
+        use_adaptive_service_url(result, adaptive_service_url)
       rescue FhirpathServiceError => e
         raise if template_from_fixture?
 
         operation_outcome('error', 'invalid', e.message)
+      end
+
+      # The simulated payer's FHIR base, where the client sends $next-question.
+      def adaptive_service_url
+        request.url.split(QUESTIONNAIRE_PACKAGE_PATH).first + FHIR_BASE_PATH
       end
 
       # ***********************************************************************
