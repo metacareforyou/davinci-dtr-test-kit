@@ -107,7 +107,12 @@ module DaVinciDTRTestKit
       request.query_parameters['token']
     end
 
-    group from: :dtr_client_payer_registration
+    # The shared registration and UDAP auth groups were written for the v2.0.1 suite and point the
+    # UDAP registration and token checks at that suite's endpoints. Point them at this suite.
+    group from: :dtr_client_payer_registration,
+          config: {
+            options: { endpoint_suite_id: :dtr_full_ehr_v220 }
+          }
     group do
       id :dtr_full_ehr_v220_questionnaire_workflows
       title 'Questionnaire Workflows'
@@ -138,6 +143,9 @@ module DaVinciDTRTestKit
             client_type: DTRFullEHROptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
           }
     group from: :dtr_client_payer_auth_udap,
+          config: {
+            options: { endpoint_suite_id: :dtr_full_ehr_v220 }
+          },
           required_suite_options: {
             client_type: DTRFullEHROptions::UDAP_CLIENT_CREDENTIALS
           }
