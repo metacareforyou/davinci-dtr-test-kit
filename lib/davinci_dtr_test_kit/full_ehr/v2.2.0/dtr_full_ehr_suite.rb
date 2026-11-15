@@ -133,7 +133,12 @@ module DaVinciDTRTestKit
       end
     end
 
+    # The shared auth group was written for the v2.0.1 suite and points the token checks at that
+    # suite's endpoints. Point them at this suite, which is the token endpoint it advertises.
     group from: :dtr_client_payer_auth_smart,
+          config: {
+            options: { endpoint_suite_id: :dtr_full_ehr_v220 }
+          },
           required_suite_options: {
             client_type: DTRFullEHROptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
           }
